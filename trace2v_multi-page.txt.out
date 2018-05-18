@@ -1,0 +1,43 @@
+1:1:# trace2v_multi-page.txt
+2:1:# Allocates multiple pages
+3:1:pagelimit 7
+4:1:# Test replicate
+5:1:replicate  ff  30000  10060000
+6:1:store   0  1   2   3   4  5  6  7  8  9  a  b  c  d  e  f  1006fff0
+7:1:diff    0  1   2   3   4  5  6  7  8  9  a  b  c  d  e  f  1006fff0
+8:1:print    12  1006ffef
+1006ffef
+ ff 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e
+ 0f ff
+9:1:# Test overlapping replicates at another set of addresses
+10:1:replicate  a3  20000  10250000
+11:1:replicate  a1  18000  10230000
+12:1:replicate  a2  18000  10248000
+13:1:diff    ff  0  1   2   3   4  5  6  7  8  9  a  b  c  d  e  f ff  1006ffef
+14:1:print       12  1006ffef
+1006ffef
+ ff 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e
+ 0f ff
+15:1:diff    a1    a1  a2  a2  10247ffe
+16:1:print       20  10247ff0
+10247ff0
+ a1 a1 a1 a1 a1 a1 a1 a1 a1 a1 a1 a1 a1 a1 a1 a1
+ a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2
+17:1:diff    a2    a2  a3  a3  1025fffe
+18:1:print       20  1025fff0
+1025fff0
+ a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2 a2
+ a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3
+19:1:print       10  1026fff0
+1026fff0
+ a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3 a3
+20:1:duplicate   10  1006fff0  010250000
+21:1:diff    a2     0   1   2   3   4  5  6  7  8  9  a  b  c  d  e  f  a2  1024ffff
+22:1:# The following line tests that diff will generate errors on mismatches.
+23:1:# There should be two mismatched bytes.  These should be the only diff errors
+24:1:# in this file.
+25:1:diff  a2     0   1   2   e   4  5  6  7  8  9  a  b  0  d  e  f  a2  1024ffff
+diff error at address 10250003, expected e, actual is 3
+diff error at address 1025000c, expected 0, actual is c
+26:1:# end of trace
+26:1:TERMINATED, free page frames = 126

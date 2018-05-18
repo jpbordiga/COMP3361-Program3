@@ -1,0 +1,26 @@
+# trace2v_multi-page.txt
+# Allocates multiple pages
+pagelimit 7
+# Test replicate
+replicate  ff  30000  10060000
+store   0  1   2   3   4  5  6  7  8  9  a  b  c  d  e  f  1006fff0
+diff    0  1   2   3   4  5  6  7  8  9  a  b  c  d  e  f  1006fff0
+print    12  1006ffef
+# Test overlapping replicates at another set of addresses
+replicate  a3  20000  10250000
+replicate  a1  18000  10230000
+replicate  a2  18000  10248000
+diff    ff  0  1   2   3   4  5  6  7  8  9  a  b  c  d  e  f ff  1006ffef
+print       12  1006ffef
+diff    a1    a1  a2  a2  10247ffe
+print       20  10247ff0
+diff    a2    a2  a3  a3  1025fffe
+print       20  1025fff0
+print       10  1026fff0
+duplicate   10  1006fff0  010250000
+diff    a2     0   1   2   3   4  5  6  7  8  9  a  b  c  d  e  f  a2  1024ffff
+# The following line tests that diff will generate errors on mismatches.
+# There should be two mismatched bytes.  These should be the only diff errors
+# in this file.
+diff  a2     0   1   2   e   4  5  6  7  8  9  a  b  0  d  e  f  a2  1024ffff
+# end of trace

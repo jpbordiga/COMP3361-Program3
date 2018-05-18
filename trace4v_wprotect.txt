@@ -1,0 +1,30 @@
+# trace4v_wprotect.txt
+# Test write protections (should be no diff mismatches)
+pagelimit 2
+replicate  0  20000  04000000
+# Set 2nd page non-writable
+permission  1  0  04010000
+# Make sure 1st page is writable
+replicate  ac  8  04000000
+diff  ac  ac  ac  ac  ac  ac  ac  ac   0  04000000
+# Next line should generate a WritePermissionFaultException
+store  12  04010010
+diff    0   0   0  0401000f
+# Next line should generate a WritePermissionFaultException
+replicate  7f  4  04010100
+diff    0   0   0   0   0   0  040100ff
+# Next line should generate a WritePermissionFaultException
+duplicate  4  04000000 04011111
+diff    0   0   0   0   0   0  04011110
+# Next line should generate a WritePermissionFaultException at address 04010000
+replicate  8d  20  0400fff0
+diff    8d  8d   0   0  0400fffe
+# Set page writable; following lines should run without exceptions or errors
+permission  1  1  04010000
+store  12  04010010
+diff    0  12   0  0401000f
+replicate  7f  4  04010100
+diff    0  7f  7f  7f  7f   0  040100ff
+duplicate  4  04000000 04011111
+diff    0  ac  ac  ac  ac   0  04011110
+# end of trace

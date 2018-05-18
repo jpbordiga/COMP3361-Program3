@@ -1,0 +1,30 @@
+# trace3v_edge-addr.txt
+# Simple test of access to first/last pages in address space.
+pagelimit 2
+store  ee  0000000e
+store  f0  3fffffff
+# Make sure allocated pages are cleared to 0 by checking scattered blocks of bytes
+diff   0  0  0  0  0  0  0  0  0  0  0  0  0  0 ee  0  00000000
+diff   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  00008000
+diff   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0000fff0
+diff   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  3fff0000
+diff   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  3fff8000
+diff   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0 f0  3ffffff0
+replicate  aa  10000  00000000
+replicate  55  10000  3fff0000
+store  81  82  83  84  85  3ffff0a0
+store  92  3ffff0a2
+diff   81  82  92  84  85  3ffff0a0
+store  bb  3ffff0ff
+diff   bb  55  3ffff0ff
+replicate  de  3  3ffff00b
+diff   55  de  de  de  55  3ffff00a
+replicate  cc  10  3ffff020
+replicate  dd  10  3ffffff0
+duplicate   5  fffff0a0  fffffff1
+diff   dd  81  82  92  84  85  dd dd dd dd dd dd dd dd dd dd  3ffffff0
+print  100  3ffff000
+duplicate  10  3ffffff0 00000000
+print  10  00000000
+print  10  3ffffff0
+# end of trace

@@ -1,0 +1,25 @@
+# trace1v.txt - simple trace file
+pagelimit 1
+# Allocate a page by writing a single byte
+replicate  b 1 2000000f
+# Make sure allocated page is cleared to 0 by checking scattered blocks of bytes
+diff  0  0   0   0   0   0  0  0  0  0  0  0  0  0  0  b  20000000
+diff  0  0   0   0   0   0  0  0  0  0  0  0  0  0  0  0  20008000
+diff  0  0   0   0   0   0  0  0  0  0  0  0  0  0  0  0  2000fff0
+# Fill with different value and check again
+replicate  55 10000 20000000
+diff  55  55   55   55   55   55  55  55  55  55  55  55  55  55  55  55  20000000
+diff  55  55   55   55   55   55  55  55  55  55  55  55  55  55  55  55  20008000
+diff  55  55   55   55   55   55  55  55  55  55  55  55  55  55  55  55  2000fff0
+store      81    82  83  84  85  200000a0
+store      92 200000a2
+diff  81  82  92  84  85  200000a0
+store      aa  200000ff
+diff       aa  200000ff
+replicate     de  3  2000000b
+diff  55    de  de  de  55  2000000a
+replicate     cc  10  20000020
+duplicate  6  200000a0  20000021  
+diff  cc    81  82  92  84  85  20000020
+print  100  20000000
+# end of trace

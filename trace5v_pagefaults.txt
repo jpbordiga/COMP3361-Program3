@@ -1,0 +1,27 @@
+# trace5v_pagefaults.txt
+# Test page fault exception handling
+pagelimit c
+# Allocate memory by writing to some pages
+store  0  04000000
+replicate  0  20001  07530000
+replicate  0  30001  0afeffff
+replicate  0  10  3fffa000
+# Each of the following lines should generate a PageFaultException
+diff   0  3ffeffff
+diff   0   0  0b01ffff
+print  20  0400fff0
+# Test that store completes across page boundaries (no page fault)
+store  22  33  0400ffff
+diff   0  22  33  00  0400fffe
+# Test that duplicate completes up to a read page fault
+# (duplicate page faults, store and diff should succeed)
+store  42  43  0755fffe
+duplicate  3  0755fffe 3fff0100
+diff   0  42  43   0  3fff00ff
+# Test that duplicate completes across page boundary (no page fault)
+store  08  09  0a  0b  0c  0d  0e  0f 07550000
+duplicate  8  07550000 0755fffc
+diff  00  08  09  0a  0b  0c  0d  0e  0f  00  0755fffb
+# Finally, the following line should terminate the process with page limit exceeded
+duplicate  2  3fff0000  3000ffff
+# end of trace
