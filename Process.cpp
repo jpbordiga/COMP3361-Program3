@@ -1,11 +1,3 @@
-/*
- * Process implementation 
- * 
- * File:   Process.cpp
- * Author: Mike Goss <mikegoss@cs.du.edu>
- * 
- */
-
 #include "Process.h"
 #include "PageTableManager.h"
 
@@ -52,7 +44,7 @@ void Process::Run(void) {
   // Select the command to execute
   while (ParseCommand(line, cmd, cmdArgs)) {
     if (cmd == "map" ) {
-      CmdMap(line, cmd, cmdArgs);         // allocate and map pages
+      CmdPageLimit(line, cmd, cmdArgs);         // allocate and map pages
     } else if (cmd == "diff") {
       CmdDiff(line, cmd, cmdArgs);        // get and compare multiple bytes
     } else if (cmd == "store") {
@@ -113,11 +105,13 @@ bool Process::ParseCommand(
   }
 }
 
-void Process::CmdMap(const string &line, 
+void Process::CmdPageLimit(const string &line, 
                          const string &cmd, 
                          vector<uint32_t> &cmdArgs) {
-  // Allocate the specified memory pages
-  ptm.MapProcessPages(cmdArgs.at(1), cmdArgs.at(0));
+    
+    max_pages = cmdArgs.at(0);
+    std::cout << max_pages << " !!!!\n";
+    
 }
 
 void Process::CmdDiff(const string &line,
@@ -284,3 +278,4 @@ void Process::CmdPermission(const string &line,
   // Change the permissions of the specified pages
   ptm.SetPageWritePermission(cmdArgs.at(2), cmdArgs.at(0), cmdArgs.at(1));
 }
+

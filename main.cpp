@@ -1,10 +1,3 @@
-/* COMP3361 Operating Systems Spring 2018
- * Program 2 Sample Solution
- * 
- * File:   main.cpp
- * Author: Mike Goss <mikegoss@cs.du.edu>
- */
-
 #include "MemoryAllocator.h"
 #include "PageTableManager.h"
 #include "Process.h"

@@ -1,9 +1,3 @@
-/*  MemoryAllocator - allocate pages in memory
- * 
- * File:   MemoryAllocator.cpp
- * Author: Mike Goss <mikegoss@cs.du.edu>
- */
-
 #include "MemoryAllocator.h"
 
 #include <array>

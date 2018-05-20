@@ -1,89 +1,18 @@
 /*
- * Process - execute memory trace file in the following format:
- *
- * Trace File Format
- * Trace records contain multiple fields, separated by white space (blanks and 
- * tabs). Each line consists of a command name, followed by optional hexadecimal 
- * integer arguments to the command. The command name is case sensitive (all 
- * lower case).
- * 
- * The trace file will contain the following record types. All numerical values 
- * (including counts) are hexadecimal (base 16), without a leading "0x". Any 
- * output should also use hexadecimal format for numeric data except where 
- * otherwise specified.
- * 
- * Allocate and Map Memory
- *   map pages vaddr
- *   Allocate virtual memory for the number of pages specified by pages, 
- *   starting at virtual address vaddr. The starting address, vaddr, must be an 
- *   exact multiple of the page size (0x10000). The first line of the file must 
- *   be a map command. Subsequent map commands add additional blocks of 
- *   allocated virtual memory, they do not remove earlier allocations. All pages 
- *   should be marked Writable in the 1st and 2nd level page tables when 
- *   initially allocated. All newly-allocated memory must be initialized 
- *   to all 0.
- *  
- * Find Different Bytes
- *   diff expected_values addr
- *   Examine bytes starting at addr; expected_values is a list of byte values, 
- *   separated by white space. If the actual values of bytes starting at addr are 
- *   different from the expected_values, write an error message to standard error 
- *   for each different byte with the address, the expected value, and the actual 
- *   value (all in hexadecimal). Follow the format shown in the sample output in 
- *   the assignment.
- * 
- * Store Bytes
- *   store values addr
- *   Store values starting at addr; values is a list of byte values, separated 
- *   by white space. 
- * 
- * Replicate Byte Value
- *   replicate value count addr
- *   Store count copies of value starting at addr.
- * 
- * Duplicate Bytes
- *   duplicate count src_addr dest_addr
- *   Duplicate count bytes starting at src_addr into count bytes starting at 
- *   dest_addr. The source and destination ranges will not overlap.
- * 
- * Print Bytes
- *   print count addr
- *   Write a line with addr to standard output, followed on separate lines by 
- *   count bytes starting at addr. Write 16 bytes per line, with a space between 
- *   adjacent values. Print each byte as exactly 2 digits with a leading 0 for 
- *   values less than 10 (hex). For example, to print the 24 bytes starting 
- *   at 3fa700:
- * 
- *   3fa700
- *    00 12 f3 aa 00 00 00 a0 ff ff e7 37 21 08 6e 00
- *    55 a5 9a 9b 9c ba fa f0
- * 
- * Comment
- *   comment text
- *   The # character in the first column means the remainder of the line should 
- *   be treated as a comment. The command should be echoed to output in the same 
- *   way as other commands, but should otherwise be ignored. Lines which are 
- *   empty or all blank should also be treated as comments.
- * 
- * Change Write Permission
- *   permission pages status vaddr
- *   Change the write permission status of the number of pages specified by 
- *   pages, starting at virtual address vaddr. The starting address, vaddr, must 
- *   be an exact multiple of the page size (0x10000). If status is 0, the 
- *   Writable bit in the page table should be cleared for all Present pages in 
- *   the range, otherwise the Writable bit in the page table should be set for 
- *   all Present pages in the range. Any pages in the range which are not 
- *   Present should be ignored.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 /* 
  * File:   Process.h
- * Author: Mike Goss <mikegoss@cs.du.edu>
+ * Author: jpbordiga
  *
+ * Created on May 19, 2018, 4:58 PM
  */
 
-#ifndef PROCESSTRACE_H
-#define PROCESSTRACE_H
+#ifndef PROCESS_H
+#define PROCESS_H
 
 #include "PageTableManager.h"
 
@@ -127,6 +56,7 @@ private:
   std::string file_name;
   std::fstream trace;
   long line_number;
+  uint32_t max_pages;
 
   // Memory contents
   mem::MMU &memory;
@@ -154,7 +84,7 @@ private:
    * @param cmd command, converted to all lower case
    * @param cmdArgs arguments to command
    */
-  void CmdMap(const std::string &line, 
+  void CmdPageLimit(const std::string &line, 
               const std::string &cmd, 
               std::vector<uint32_t> &cmdArgs);
   void CmdDiff(const std::string &line, 
@@ -177,5 +107,5 @@ private:
                      std::vector<uint32_t> &cmdArgs);
 };
 
-#endif /* PROCESSTRACE_H */
+#endif /* PROCESS_H */
 

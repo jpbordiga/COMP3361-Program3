@@ -1,10 +1,3 @@
-/* PageTableManager - page table functionality for COMP3361 Spring 2018
- *   Program Assignment 2
- *  
- * File:   PageTableManager.h
- * Author: Mike Goss <mikegoss@cs.du.edu>
- */
-
 #include "PageTableManager.h"
 
 #include <stdexcept>
@@ -153,3 +146,4 @@ PMCB PageTableManager::SwitchToKernelPageTable(void) {
   memory.set_PMCB(kernel_pmcb);  // switch to kernel PMCB
   return prev_PMCB;
 }
+
