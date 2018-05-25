@@ -32,7 +32,7 @@ public:
    * @param memory MMU class object to use for memory
    * @param ptm page table manager
    */
-  Process(const std::string &file_name_, mem::MMU &memory_, PageTableManager &ptm_);
+  Process(const std::string &file_name_, int processNumber, mem::MMU &memory_, PageTableManager &ptm_, MemoryAllocator &allocator_);
   
   /**
    * Destructor - close trace file, clean up processing
@@ -40,6 +40,7 @@ public:
   virtual ~Process(void);
 
   // Other constructors, assignment
+  //Process(const Process &other);
   Process(const Process &other) = delete;
   Process(Process &&other) = delete;
   Process operator=(const Process &other) = delete;
@@ -49,14 +50,16 @@ public:
    * Run - read and process commands from trace file
    * 
    */
-  void Run(void);
+   bool Run(int n);
   
 private:
   // Trace file
   std::string file_name;
   std::fstream trace;
   long line_number;
+  int process_number;
   uint32_t max_pages;
+  uint32_t current_num_pages;
 
   // Memory contents
   mem::MMU &memory;
@@ -64,6 +67,9 @@ private:
   
   // Page table access
   PageTableManager &ptm;
+  
+  // Allocator access
+  MemoryAllocator &allocator;
   
   /**
    * ParseCommand - parse a trace file command.

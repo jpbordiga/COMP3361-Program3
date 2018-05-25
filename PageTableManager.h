@@ -76,6 +76,12 @@ public:
    */
   mem::PMCB SwitchToKernelPageTable(void);
   
+  /**
+   * FreePageFrames - access allocator and free up caller's page frames
+   * 
+   */
+  void FreePageFrames(size_t count);
+  
  private:
    // Save references to memory and allocator
    mem::MMU &memory;
@@ -83,6 +89,8 @@ public:
    
    mem::Addr kernel_page_table;  // address of kernel page table
    mem::PMCB kernel_pmcb;   // PMCB for kernel mode
+  
+   std::vector<mem::Addr> already_mapped;
 
 };
 

@@ -68,7 +68,7 @@ void PageTableManager::MapProcessPages(Addr vaddr, size_t count) {
   }
   
   // Map the allocated pages
-  vector<Addr> already_mapped;  // any pages that are already mapped
+  //<Addr> already_mapped;  // any pages that are already mapped
   Addr next_vaddr = vaddr;
   while (!allocated.empty()) {
     Addr pt_index = next_vaddr >> mem::kPageSizeBits;
@@ -145,5 +145,9 @@ PMCB PageTableManager::SwitchToKernelPageTable(void) {
   memory.get_PMCB(prev_PMCB);    // get the current PMCB
   memory.set_PMCB(kernel_pmcb);  // switch to kernel PMCB
   return prev_PMCB;
+}
+
+void PageTableManager::FreePageFrames(size_t count){
+    allocator.FreePageFrames(count, already_mapped);
 }
 
