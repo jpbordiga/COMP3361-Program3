@@ -187,26 +187,34 @@ void Process::CmdStore(const string &line,
         memory.put_bytes(addr, cmdArgs.size(), buffer);
     } catch(mem::PageFaultException e) {
         
+        std::cout << "0 ^^^^\n";
         memory.get_PMCB(proc_pmcb);
-        cout << "PageFaultException at address " << std::hex 
-                <<  proc_pmcb.next_vaddress << ": " << e.what() << "\n";
+        std::cout << "1 ^^^^\n";
+        
+        std::cout << "2 ^^^^\n";
         proc_pmcb.operation_state = mem::PMCB::NONE;  // clear fault
-        memory.set_PMCB(proc_pmcb);
+        std::cout << "3 ^^^^\n";
+
+        ptm.SwitchToKernelPageTable();
+        std::cout << "4 ^^^^\n";
+        ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1); //
         
-        // allocate another to accommodate page fault
-        
-        ptm.MapProcessPages(proc_pmcb.next_vaddress, 1);
-        current_num_pages++; // other places to increment?
-        
-        if(current_num_pages > max_pages){
-            std::cout << "ERROR: number of pages exceeded maximum page number limit";
+        //current_num_pages++; // other places to increment?
+        std::cout << "current_num_pages incremented $$$$\n";
+        if(current_num_pages > max_pages){ //
+            std::cout << " ERROR: page count exceeded maximum number of pages";
             std::exit(3);
         }
         
-         // reload PMCB's previous state and resume
-        
-        proc_pmcb.operation_state = mem::PMCB::WRITE_OP;
-        memory.set_PMCB(proc_pmcb);
+        std::cout << "5 ^^^^\n";
+       try {
+           std::cout << "6 ^^^^\n";
+           memory.set_PMCB(proc_pmcb);
+           std::cout << "7 ^^^^\n";
+       } catch(mem::PageFaultException e) {
+           std::cout << "8 ^^^^\n";
+           throw e;
+       }
         
       
     } catch(mem::WritePermissionFaultException e) {
@@ -240,28 +248,34 @@ void Process::CmdDupl(const string &line,
       
     } catch(mem::PageFaultException e) {
         
-        // reload PMCB in try/catch block
-        
+        std::cout << "0 ^^^^\n";
         memory.get_PMCB(proc_pmcb);
-        cout << "PageFaultException at address " << std::hex 
-                <<  proc_pmcb.next_vaddress << ": " << e.what() << "\n";
+        std::cout << "1 ^^^^\n";
+        
+        std::cout << "2 ^^^^\n";
         proc_pmcb.operation_state = mem::PMCB::NONE;  // clear fault
-        memory.set_PMCB(proc_pmcb);
+        std::cout << "3 ^^^^\n";
+
+        ptm.SwitchToKernelPageTable();
+        std::cout << "4 ^^^^\n";
+        ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1); //
         
-        // allocate another to accommodate page fault
-        
-        ptm.MapProcessPages(proc_pmcb.next_vaddress, 1);
-        current_num_pages++; // other places to increment?
-        
-        if(current_num_pages > max_pages){
-            std::cout << "ERROR: number of pages exceeded maximum page number limit";
+        //current_num_pages++; // other places to increment?
+        std::cout << "current_num_pages incremented $$$$\n";
+        if(current_num_pages > max_pages){ //
+            std::cout << " ERROR: page count exceeded maximum number of pages";
             std::exit(3);
         }
         
-         // reload PMCB's previous state and resume
-        
-        proc_pmcb.operation_state = mem::PMCB::WRITE_OP;
-        memory.set_PMCB(proc_pmcb);
+        std::cout << "5 ^^^^\n";
+       try {
+           std::cout << "6 ^^^^\n";
+           memory.set_PMCB(proc_pmcb);
+           std::cout << "7 ^^^^\n";
+       } catch(mem::PageFaultException e) {
+           std::cout << "8 ^^^^\n";
+           throw e;
+       }
         
     } catch(mem::WritePermissionFaultException e) {
         
@@ -290,26 +304,34 @@ void Process::CmdRepl(const string &line,
       
     } catch(mem::PageFaultException e) {
         
+        std::cout << "0 ^^^^\n";
         memory.get_PMCB(proc_pmcb);
-        cout << "PageFaultException at address " << std::hex 
-                <<  proc_pmcb.next_vaddress << ": " << e.what() << "\n";
+        std::cout << "1 ^^^^\n";
+        
+        std::cout << "2 ^^^^\n";
         proc_pmcb.operation_state = mem::PMCB::NONE;  // clear fault
-        memory.set_PMCB(proc_pmcb);
+        std::cout << "3 ^^^^\n";
+
+        ptm.SwitchToKernelPageTable();
+        std::cout << "4 ^^^^\n";
+        ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1); //
         
-        // allocate another to accommodate page fault
-        
-        ptm.MapProcessPages(proc_pmcb.next_vaddress, 1);
-        current_num_pages++; // other places to increment?
-        
-        if(current_num_pages > max_pages){
-            std::cout << "ERROR: number of pages exceeded maximum page number limit";
+        //current_num_pages++; // other places to increment?
+        std::cout << "current_num_pages incremented $$$$\n";
+        if(current_num_pages > max_pages){ //
+            std::cout << " ERROR: page count exceeded maximum number of pages";
             std::exit(3);
         }
         
-         // reload PMCB's previous state and resume
-        
-        proc_pmcb.operation_state = mem::PMCB::WRITE_OP;
-        memory.set_PMCB(proc_pmcb);
+        std::cout << "5 ^^^^\n";
+       try {
+           std::cout << "6 ^^^^\n";
+           memory.set_PMCB(proc_pmcb);
+           std::cout << "7 ^^^^\n";
+       } catch(mem::PageFaultException e) {
+           std::cout << "8 ^^^^\n";
+           throw e;
+       }
         
     } catch(mem::WritePermissionFaultException e) {
         
