@@ -74,8 +74,7 @@ bool Process::Run(int n) { // mod
         } else {
             
             // free up pages (change to kernel and free up pages, free up p pt)
-            
-            
+           
             // incorrect?
             ptm.SwitchToKernelPageTable();
             ptm.FreePageFrames(current_num_pages); //
@@ -83,7 +82,6 @@ bool Process::Run(int n) { // mod
             memory.set_PMCB(proc_pmcb);
             ptm.FreePageFrames(current_num_pages);
             //
-            
             
             std::cout << line_number << ":" << process_number << ":TERMINATED, free page frames = " << allocator.get_page_frames_free() << "\n";
             
@@ -203,31 +201,29 @@ bool Process::CmdStore(const string &line,
     while(bytesRemaining){
         
         try {
-
-            std::cout << "0 ****\n";
             
             if(putBytesCalled == false){
-                std::cout << "1 ****\n";
+              
                 memory.put_bytes(addr, cmdArgs.size(), buffer);
-                std::cout << "2 ****\n";
+                
             } else {
-                std::cout << "3 ****\n";
+                
                 memory.set_PMCB(proc_pmcb);
-                std::cout << "4 ****\n";
+                
             }
-            std::cout << "5 ****\n";
+            
             putBytesCalled = true;
             
         } catch(mem::PageFaultException e) {
 
-            std::cout << "6 ****\n";
+            
             memory.get_PMCB(proc_pmcb);
-            std::cout << "7 ****\n";
+            
             ptm.SwitchToKernelPageTable();
-            std::cout << "8 ****\n";
+            
             ptm.MapProcessPages(addr & mem::kPageNumberMask, 1); //
             //ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1); //
-            std::cout << "9 ****\n";
+           
             
             current_num_pages++; // other places to increment?
                 
@@ -246,12 +242,12 @@ bool Process::CmdStore(const string &line,
             memory.set_PMCB(proc_pmcb);
 
         }
-        std::cout << "10 ****\n";
+        
         proc_pmcb.operation_state = mem::PMCB::NONE;
         bytesRemaining = false;
-        std::cout << "11 ****\n";
+        
     }
-    std::cout << "12 ****\n";
+    
     
 }
 
@@ -282,30 +278,28 @@ bool Process::CmdDupl(const string &line,
         
         try {
 
-            std::cout << "0 %%%%\n";
-            
             if(putBytesCalled == false){
-                std::cout << "1 %%%%\n";
+                
                 memory.put_bytes(dst, count, &src);
-                std::cout << "2 %%%%\n";
+               
             } else {
-                std::cout << "3 %%%%\n";
+                
                 memory.set_PMCB(proc_pmcb);
-                std::cout << "4 %%%%\n";
+                
             }
-            std::cout << "5 %%%%\n";
+           
             putBytesCalled = true;
             
         } catch(mem::PageFaultException e) {
 
-            std::cout << "6 %%%%\n";
+            
             memory.get_PMCB(proc_pmcb);
-            std::cout << "7 %%%%\n";
+            
             ptm.SwitchToKernelPageTable();
-            std::cout << "8 %%%%\n";
+           
             ptm.MapProcessPages(dst & mem::kPageNumberMask, 1); //
             //ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1); //
-            std::cout << "9 %%%%\n";
+            
             
             current_num_pages++; // other places to increment?
                 
@@ -324,12 +318,11 @@ bool Process::CmdDupl(const string &line,
             memory.set_PMCB(proc_pmcb);
 
         }
-        std::cout << "10 %%%%\n";
+        
         proc_pmcb.operation_state = mem::PMCB::NONE;
         bytesRemaining = false;
-        std::cout << "11 %%%%\n";
+        
     }
-    std::cout << "12 %%%%\n";
     
 }
 
@@ -349,31 +342,29 @@ bool Process::CmdRepl(const string &line,
     while(bytesRemaining){
         
         try {
-
-            std::cout << "0 ^^^^\n";
             
             if(putBytesCalled == false){
-                std::cout << "1 ^^^^\n";
+               
                 memory.put_bytes(addr, count, &value);
-                std::cout << "2 ^^^^\n";
+                
             } else {
-                std::cout << "3 ^^^^\n";
+                
                 memory.set_PMCB(proc_pmcb);
-                std::cout << "4 ^^^^\n";
+
             }
-            std::cout << "5 ^^^^\n";
+            
             putBytesCalled = true;
             
         } catch(mem::PageFaultException e) {
 
-            std::cout << "6 ^^^^\n";
+            
             memory.get_PMCB(proc_pmcb);
-            std::cout << "7 ^^^^\n";
+           
             ptm.SwitchToKernelPageTable();
-            std::cout << "8 ^^^^\n";
+            
             ptm.MapProcessPages(addr & mem::kPageNumberMask, 1); //
             //ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1); //
-            std::cout << "9 ^^^^\n";
+            
             
             current_num_pages++; // other places to increment?
                 
@@ -392,12 +383,11 @@ bool Process::CmdRepl(const string &line,
             memory.set_PMCB(proc_pmcb);
 
         }
-        std::cout << "10 ^^^^\n";
+       
         proc_pmcb.operation_state = mem::PMCB::NONE;
         bytesRemaining = false;
-        std::cout << "11 ^^^^\n";
+        
     }
-    std::cout << "12 ^^^^\n";
     
 }
 
@@ -449,78 +439,3 @@ void Process::CmdPermission(const string &line,
   ptm.SetPageWritePermission(cmdArgs.at(2), cmdArgs.at(0), cmdArgs.at(1));
 }
 
-//            std::cout << "0 ^^^^\n";
-//            memory.get_PMCB(proc_pmcb);
-//            std::cout << "1 ^^^^\n";
-//
-//            std::cout << "2 ^^^^\n";
-//            //proc_pmcb.operation_state = mem::PMCB::NONE;  // clear fault
-//            std::cout << "3 ^^^^\n";
-//
-//            ptm.SwitchToKernelPageTable();
-//            std::cout << "4 ^^^^\n";
-//            ptm.MapProcessPages(addr & mem::kPageNumberMask, 1); //
-//
-//            current_num_pages++; // other places to increment?
-//            std::cout << "current_num_pages incremented $$$$\n";
-//            if(current_num_pages > max_pages){ //
-//                std::cout << " ERROR: page count exceeded maximum number of pages";
-//                pageLimitExceeded = true;
-//                return pageLimitExceeded;
-//            }
-//
-//            std::cout << "5 ^^^^\n";
-//            try {
-//                std::cout << "6 ^^^^\n";
-//                memory.set_PMCB(proc_pmcb);
-//                std::cout << "7 ^^^^\n";
-//            } catch(mem::PageFaultException e) {
-//                std::cout << "8 ^^^^\n";
-//                retried = "Retried";
-//                //throw e;
-//                std::cout << "9 ^^^^\n";
-//            }
-//
-//
-//            std::cout << "10 ^^^^\n";
-
-
-
-
-
-
-
-//            bool exceptionsHandled = false;
-//            
-//            while(exceptionsHandled == false){
-//            
-//                std::cout << "0 ^^^^\n";
-//
-//                memory.get_PMCB(proc_pmcb);
-//                std::cout << "1 ^^^^\n";
-//                ptm.SwitchToKernelPageTable();
-//                std::cout << "2 ^^^^\n";
-//                ptm.MapProcessPages(addr & mem::kPageNumberMask, 1); //
-//                std::cout << "3 ^^^^\n";
-//                current_num_pages++; // other places to increment?
-//                std::cout << "4 ^^^^\n";
-//                
-////                if(current_num_pages > max_pages){ //
-////                    std::cout << " ERROR: page count exceeded maximum number of pages";
-////                    pageLimitExceeded = true;
-////                    return pageLimitExceeded;
-////                }
-//
-//                try {
-//                    std::cout << "5 ^^^^\n";
-//                    memory.set_PMCB(proc_pmcb);
-//                    std::cout << "6 ^^^^\n";
-//                } catch(mem::PageFaultException e) {
-//                    std::cout << "7 ^^^^\n";
-//                    exceptionsHandled = false;
-//                    
-//                }
-//                
-//                exceptionsHandled = true;
-//                std::cout << "8 ^^^^\n";
-//            }
