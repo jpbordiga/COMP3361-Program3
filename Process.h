@@ -96,13 +96,13 @@ private:
   void CmdDiff(const std::string &line, 
                const std::string &cmd, 
                std::vector<uint32_t> &cmdArgs);
-  void CmdStore(const std::string &line, 
+  bool CmdStore(const std::string &line, 
                 const std::string &cmd, 
                 std::vector<uint32_t> &cmdArgs);
-  void CmdRepl(const std::string &line, 
+  bool CmdRepl(const std::string &line, 
                const std::string &cmd, 
                std::vector<uint32_t> &cmdArgs);
-  void CmdDupl(const std::string &line, 
+  bool CmdDupl(const std::string &line, 
                const std::string &cmd, 
                std::vector<uint32_t> &cmdArgs);
   void CmdPrint(const std::string &line, 
