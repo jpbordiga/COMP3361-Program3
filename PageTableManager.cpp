@@ -101,7 +101,7 @@ void PageTableManager::MapProcessPages(Addr vaddr, size_t count) {
     allocator.FreePageFrames(already_mapped.size(), already_mapped);
   }
   
-  memory.set_PMCB(proc_pmcb);  // restore process PMCB
+  //memory.set_PMCB(proc_pmcb);  // restore process PMCB
 }
 
 void PageTableManager::SetPageWritePermission(mem::Addr vaddr, 
