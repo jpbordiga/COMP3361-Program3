@@ -187,67 +187,12 @@ bool Process::CmdStore(const string &line,
     // Build buffer
     uint8_t buffer[cmdArgs.size()];
     for (size_t i = 0; i < cmdArgs.size(); ++i) {
-      buffer[i] = cmdArgs[i];
+        buffer[i] = cmdArgs[i];
     }
 
-    bool bytesRemaining = false;
-    bool putBytesCalled = false;
+    pageLimitExceeded = MMUWrite(addr, cmdArgs.size(), buffer);
     
-    // Write to MMU
-    
-    //addr, cmdArgs.size(), buffer
-    //addr & mem::kPageNumberMask, 1
-    
-    while(bytesRemaining){
-        
-        try {
-            
-            if(putBytesCalled == false){
-              
-                memory.put_bytes(addr, cmdArgs.size(), buffer);
-                
-            } else {
-                
-                memory.set_PMCB(proc_pmcb);
-                
-            }
-            
-            putBytesCalled = true;
-            
-        } catch(mem::PageFaultException e) {
-
-            
-            memory.get_PMCB(proc_pmcb);
-            
-            ptm.SwitchToKernelPageTable();
-            
-            ptm.MapProcessPages(addr & mem::kPageNumberMask, 1); //
-            //ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1); //
-           
-            
-            current_num_pages++; // other places to increment?
-                
-            if(current_num_pages > max_pages){ //
-                std::cout << " ERROR: page count exceeded maximum number of pages";
-                pageLimitExceeded = true;
-                return pageLimitExceeded;
-            }
-             
-        } catch(mem::WritePermissionFaultException e) {
-
-            memory.get_PMCB(proc_pmcb);
-            cout << "WritePermissionFaultException at address " << std::hex 
-                    <<  proc_pmcb.next_vaddress << ": " << e.what() << "\n";
-            proc_pmcb.operation_state = mem::PMCB::NONE;  // clear fault
-            memory.set_PMCB(proc_pmcb);
-
-        }
-        
-        proc_pmcb.operation_state = mem::PMCB::NONE;
-        bytesRemaining = false;
-        
-    }
-    
+    return pageLimitExceeded;
     
 }
 
@@ -255,74 +200,23 @@ bool Process::CmdDupl(const string &line,
                       const string &cmd,
                       vector<uint32_t> &cmdArgs) {
     
-//    while (count-- > 0) {
-//        memory.get_byte(&b, src++);
-//        memory.put_byte(dst++, &b);
-//    }
-    
-    //memory.put_bytes(dst, count, &src);
-    //dst & mem::kPageNumberMask, 1
-    
-    // Duplicate specified number of bytes to destination from source
+    // Duplicate specified number of bytes from source to destination
     Addr dst = cmdArgs.at(2);
     Addr src = cmdArgs.at(1);
     uint32_t count = cmdArgs.at(0);
+    uint8_t buffer[count];
     uint8_t b;
-    bool putBytesCompleted = false;
-    bool putBytesCalled = false;
     bool pageLimitExceeded = false;
-    bool bytesRemaining = true;
     
-    
-    while(bytesRemaining){
-        
-        try {
-
-            if(putBytesCalled == false){
-                
-                memory.put_bytes(dst, count, &src);
-               
-            } else {
-                
-                memory.set_PMCB(proc_pmcb);
-                
-            }
-           
-            putBytesCalled = true;
-            
-        } catch(mem::PageFaultException e) {
-
-            
-            memory.get_PMCB(proc_pmcb);
-            
-            ptm.SwitchToKernelPageTable();
-           
-            ptm.MapProcessPages(dst & mem::kPageNumberMask, 1); //
-            //ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1); //
-            
-            
-            current_num_pages++; // other places to increment?
-                
-            if(current_num_pages > max_pages){ //
-                std::cout << " ERROR: page count exceeded maximum number of pages";
-                pageLimitExceeded = true;
-                return pageLimitExceeded;
-            }
-             
-        } catch(mem::WritePermissionFaultException e) {
-
-            memory.get_PMCB(proc_pmcb);
-            cout << "WritePermissionFaultException at address " << std::hex 
-                    <<  proc_pmcb.next_vaddress << ": " << e.what() << "\n";
-            proc_pmcb.operation_state = mem::PMCB::NONE;  // clear fault
-            memory.set_PMCB(proc_pmcb);
-
-        }
-        
-        proc_pmcb.operation_state = mem::PMCB::NONE;
-        bytesRemaining = false;
-        
+    // Build buffer
+    for (size_t i = count; count > i; --i) { //
+        memory.get_byte(&b, src++); 
+        memory.put_byte(buffer[i], &b);
     }
+    
+    pageLimitExceeded = MMUWrite(src, count, buffer);
+    
+    return pageLimitExceeded;
     
 }
 
@@ -338,34 +232,45 @@ bool Process::CmdRepl(const string &line,
     bool putBytesCalled = false;
     bool pageLimitExceeded = false;
     
+    // Build buffer
+    uint8_t buffer[count];
+    for (size_t i = 0; i < count; ++i) {
+        buffer[i] = value; // Replicate
+    }
     
-    while(bytesRemaining){
-        
+    pageLimitExceeded = MMUWrite(addr, count, buffer);
+    
+    return pageLimitExceeded;
+    
+}
+
+bool Process::MMUWrite(Addr addr_, uint32_t count_, uint8_t buffer[]) {
+
+    uint32_t addr = addr_;
+    uint32_t byte_count = count_;
+    bool first_write_attempt = true;
+    bool pageLimitExceeded = false;
+    
+    while(byte_count != 0){
+    
         try {
-            
-            if(putBytesCalled == false){
-               
-                memory.put_bytes(addr, count, &value);
+
+            if(first_write_attempt){
+                
+                first_write_attempt = false;
+                memory.put_bytes(addr, byte_count, buffer); // entire buffer
+                byte_count = 0;
                 
             } else {
+            
+                memory.set_PMCB(proc_pmcb); //
                 
-                memory.set_PMCB(proc_pmcb);
-
             }
-            
-            putBytesCalled = true;
-            
+                
         } catch(mem::PageFaultException e) {
 
-            
-            memory.get_PMCB(proc_pmcb);
-           
-            ptm.SwitchToKernelPageTable();
-            
-            ptm.MapProcessPages(addr & mem::kPageNumberMask, 1); //
-            //ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1); //
-            
-            
+            ptm.MapProcessPages(addr & mem::kPageNumberMask, 1); 
+            byte_count = proc_pmcb.remaining_count;
             current_num_pages++; // other places to increment?
                 
             if(current_num_pages > max_pages){ //
@@ -373,7 +278,7 @@ bool Process::CmdRepl(const string &line,
                 pageLimitExceeded = true;
                 return pageLimitExceeded;
             }
-             
+            
         } catch(mem::WritePermissionFaultException e) {
 
             memory.get_PMCB(proc_pmcb);
@@ -383,15 +288,12 @@ bool Process::CmdRepl(const string &line,
             memory.set_PMCB(proc_pmcb);
 
         }
-       
-        proc_pmcb.operation_state = mem::PMCB::NONE;
-        bytesRemaining = false;
+        
+        memory.get_PMCB(proc_pmcb);
         
     }
-    
+
 }
-
-
 
 void Process::CmdPrint(const string &line,
                        const string &cmd,
