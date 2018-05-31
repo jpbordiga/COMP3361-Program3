@@ -111,6 +111,8 @@ private:
   void CmdPermission(const std::string &line, 
                      const std::string &cmd, 
                      std::vector<uint32_t> &cmdArgs);
+  bool MMUWrite(mem::Addr addr_, uint32_t count_, uint8_t buffer[]);
+  
 };
 
 #endif /* PROCESS_H */
