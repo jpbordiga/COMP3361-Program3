@@ -251,26 +251,35 @@ bool Process::MMUWrite(Addr addr_, uint32_t count_, uint8_t buffer[]) {
     bool first_write_attempt = true;
     bool pageLimitExceeded = false;
     
-    while(byte_count != 0){
+    std::cout << "0 ****\n";
     
+    while(byte_count != 0){
+        std::cout << "1 ****\n";
         try {
-
+            std::cout << "2 ****\n";
             if(first_write_attempt){
-                
+                std::cout << "3 ****\n";
                 first_write_attempt = false;
+                std::cout << "4 ****\n";
                 memory.put_bytes(addr, byte_count, buffer); // entire buffer
+                std::cout << "5 ****\n";
                 byte_count = 0;
-                
+                std::cout << "6 ****\n";
             } else {
-            
+                std::cout << "7 ****\n";
                 memory.set_PMCB(proc_pmcb); //
-                
+                std::cout << "8 ****\n";
             }
                 
         } catch(mem::PageFaultException e) {
-
-            ptm.MapProcessPages(addr & mem::kPageNumberMask, 1); 
+            
+            std::cout << "9 ****\n";
+            memory.get_PMCB(proc_pmcb);
+            std::cout << "10 ****\n";
+            ptm.MapProcessPages(proc_pmcb.next_vaddress & mem::kPageNumberMask, 1);
+            std::cout << "11 ****\n";
             byte_count = proc_pmcb.remaining_count;
+            std::cout << "12 ****\n";
             current_num_pages++; // other places to increment?
                 
             if(current_num_pages > max_pages){ //
@@ -278,7 +287,7 @@ bool Process::MMUWrite(Addr addr_, uint32_t count_, uint8_t buffer[]) {
                 pageLimitExceeded = true;
                 return pageLimitExceeded;
             }
-            
+            std::cout << "13 ****\n";
         } catch(mem::WritePermissionFaultException e) {
 
             memory.get_PMCB(proc_pmcb);
@@ -288,10 +297,11 @@ bool Process::MMUWrite(Addr addr_, uint32_t count_, uint8_t buffer[]) {
             memory.set_PMCB(proc_pmcb);
 
         }
-        
+        std::cout << "14 ****\n";
         memory.get_PMCB(proc_pmcb);
-        
+        std::cout << "15 ****\n";
     }
+ std::cout << "16 ****\n";
 
 }
 
